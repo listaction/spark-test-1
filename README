@@ -1,3 +1,8 @@
+
+Standard Play framework bootstrap 
+
+to observe the issue, just do activator run and visit the url that activator creates in the console in a browser.
+
 This is your new Play application
 =================================
 
