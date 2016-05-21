@@ -5,12 +5,9 @@ import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext._
 import org.apache.spark.sql.SQLContext
 
-case class WordCount(word: String, count: Int)
-
 object SparkSQL {
 
-  def simpleSparkSQLApp {
-    val logFile = "public/data/README.md" // Should be some file on your system
+  def simpleSparkSQLApp {    
     val driverHost = "localhost"
     val conf = new SparkConf(false) // skip loading external settings
       .setMaster("local[4]") // run locally with enough threads
@@ -18,27 +15,16 @@ object SparkSQL {
       .set("spark.logConf", "true")
       .set("spark.driver.host", s"$driverHost")
     val sc = new SparkContext(conf)
-    val logData = sc.textFile(logFile, 4).cache()
-    val words = logData.flatMap(_.split(" "))
     
     val sqlContext = new SQLContext(sc)
     
     import sqlContext._
-    val path = "/mnt/data/raw/logs/ecommerce-event-data.json"
-    val returnType = sqlContext.jsonFile(path)
-    returnType.saveAsTable("test")
-    //returnType.select("user_name").show()
-    //returnType.sqlContext.sql("select distinct(user_name) from table");
+    val path = "ecommerce-event-data.json"
+    val returnType = sqlContext.read.json(path)
+
     returnType.select("user_name").collect().foreach { x => println(x.getString(0)) }
     returnType.printSchema();
     
-//    val wordCount = words.map(word => (word,1)).reduceByKey(_+_).map(wc => WordCount(wc._1, wc._2))
-//    wordCount.registerAsTable("wordCount")
-//    
-//    val moreThanTenCounters = wordCount.where('count > 10).select('word)
-//    
-//    println("Words occuring more than 10 times are : ")
-//    moreThanTenCounters.map(mttc => "Word : " + mttc(0)).collect().foreach(println)
     
   }
 
